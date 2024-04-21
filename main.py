@@ -41,7 +41,8 @@ def extract_new_id(xml_file_path):
 
 # Function to get the name of the item using ITEM_ID with retries
 def get_item_name(item_id):
-    while True:
+    retry_count = 0
+    while retry_count < 5:
         url = f'https://economy.roblox.com/v2/assets/{item_id}/details'
         response = requests.get(url)
 
@@ -50,8 +51,13 @@ def get_item_name(item_id):
             name = data.get('Name', 'Unknown')
             return name
         else:
+            retry_count += 1
             cprint('yellow', f'Failed to get item name for ITEM_ID: {item_id}, Retrying...')
             time.sleep(2)
+    
+    cprint('red', f'Failed to get item name for ITEM_ID: {item_id} after multiple retries.')
+    return 'Unknown'
+
 
 # Function to sanitize a string
 def sanitize_filename(name):
